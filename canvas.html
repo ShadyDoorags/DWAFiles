@@ -113,7 +113,7 @@ var paintBucketActive = false;
 var paintbucketButton = document.getElementById('paintbucketButton');
 var debug = document.getElementById('debug');
 
-
+var selectedColor;
 
 canvas.width = 688;
 canvas.height = 875;
@@ -177,6 +177,7 @@ function setColor(color){
 function setSwatch(e){
 	var swatch = e.target;
     setColor(swatch.style.backgroundColor);
+	selectedColor = swatch.style.backgroundColor;
     swatch.className += ' active';
 }
 
@@ -312,12 +313,11 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 		
 		//debug.innerHTML = debug.innerHTML + x +"," + y;
 	
-		//change the color of the image needs to go here	
+			//change the color of the image needs to go here	
 		context.beginPath();
 		context.fillRect(x,y,1,1);
-		context.fillStyle = "blue"; // generic color		
+		context.fillStyle = selectedColor;		
 		context.fill();
-			
 		
 		//check if we've gone right
 		if(!canvasArray[x][y].right){
@@ -385,6 +385,8 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 				directionDecided = 0;
 			}
 		}
+		
+		
 		
 		//direction is decided, follow through
 		
