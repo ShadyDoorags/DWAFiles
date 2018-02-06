@@ -95,19 +95,7 @@ height: 30px;
 	
     
     <script>
-	//ADDED SCRIPTS BY SHADY
 	
-	//getting coordinates
-	function showCoords(event){
-	var x = event.clientX;
-    var y = event.clientY;
-    var coords = "X coords: " + x + ", Y coords: " + y;
-    document.getElementById("debug").innerHTML = coords;
-	}
-
-
-    
-	//END OF ADDED SCRIPTS
 	
 //CLEAR CANVAS
 var clearCanvas = document.getElementById('clearCanvas');
@@ -122,6 +110,7 @@ var context= canvas.getContext('2d');
 var radius = 5;
 var dragging = false;
 var paintbucketButton = document.getElementById('paintbucketButton');
+var debug = document.getElementById('debug');
 
 
 
@@ -191,6 +180,31 @@ function setSwatch(e){
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 
+//ADDED SCRIPTS BY SHADY
+	
+	//getting coordinates
+	function showCoords(event){
+	var x = event.clientX;
+    var y = event.clientY;
+    var coords = "X coords: " + x + ", Y coords: " + y;
+    debug.innerHTML = coords;
+	}
+	
+	function checkColor(event){
+	//calculate X
+	var x = event.clientX;
+	var y = event.clientY;
+	var imgData = context.getImageData(x,y,1,1);
+	var red = imgData.data[0];
+	var green = imgData.data[1];
+	var blue = imgData.data[2];
+	var alpha = imgData.data[3];
+	debug.innerHTML = "rgba at " + x +", "+ y + " = " + red + ", " + green + ", " + blue +", " + alpha;
+	}
+
+
+    
+	//END OF ADDED SCRIPTS
 
     
 
