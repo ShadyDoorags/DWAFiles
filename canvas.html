@@ -63,18 +63,22 @@ width: 55px;
 height: 30px;
 }
 
+
+
+
 </style>
 </head>
     
 <body style='margin: 0'>
+        
+   
+<div id="debug"></div>
     <div id="toolbar">
-	<div><input id="paintbucketButton" type="button" value="Paint Bucket"> </div>
     	<div id="colors"></div>
     	<div><input id="clearCanvas" type="button" value="CLEAR">
     </div>
         
-        
-    
+ 
 </div>
 </div>
 
@@ -84,14 +88,26 @@ height: 30px;
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
 	</canvas>
     
-    
+    <input id="paintbucketButton" class="myButton" type="button" value="Paint Bucket">
+<h2 onclick="checkColor(event)">Click this heading to get the x (horizontal) and y (vertical) coordinates of the mouse pointer when it was clicked.</h2>
+
 	
     
     <script>
+	//ADDED SCRIPTS BY SHADY
 	
+	function checkColor(event){
+	var x = event.clientX;
+    var y = event.clientY;
+    var coords = "X coords: " + x + ", Y coords: " + y;
+    document.getElementById("debug").innerHTML = coords;
+	
+	}
 
 
     
+	//END OF ADDED SCRIPTS
+	
 //CLEAR CANVAS
 var clearCanvas = document.getElementById('clearCanvas');
 document.getElementById('clearCanvas').addEventListener('click', function() {
