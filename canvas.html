@@ -72,7 +72,7 @@ height: 30px;
 <body style='margin: 0'>
         
    
-<div id="debug"></div>
+<div id="debug" style="position:relative;left:903px;"></div>
     <div id="toolbar">
     	<div id="colors"></div>
     	<div><input id="clearCanvas" type="button" value="CLEAR">
@@ -83,25 +83,26 @@ height: 30px;
 </div>
 
         
-    
-	<canvas onclick="checkColor(event)" id="canvas" width="903" height="996" style= "border:2px solid #000000; position:absolute; left:0; top:0">
+    <div id = "outsideCanvas">
+    <input id="paintbucketButton" style="position:absolute;left:903px;" class="myButton" type="button" value="Paint Bucket"><br/>
+<h2 onclick="showCoords(event)" style="position:relative;left:903px;">Click this heading to get the x (horizontal)<br/> and y (vertical) coordinates of the mouse pointer<br/> when it was clicked.</h2>
+	</div>
+	
+	<canvas onclick="checkColor(event)" id="canvas" width="903" height="996" style= "border:2px solid #000000; position:absolute; left:0px; top:0px">
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
 	</canvas>
     
-    <input id="paintbucketButton" class="myButton" type="button" value="Paint Bucket" style="position:relative">
-<h2 >Click this heading to get the x (horizontal) and y (vertical) coordinates of the mouse pointer when it was clicked.</h2>
-
 	
     
     <script>
 	//ADDED SCRIPTS BY SHADY
 	
-	function checkColor(event){
+	//getting coordinates
+	function showCoords(event){
 	var x = event.clientX;
     var y = event.clientY;
     var coords = "X coords: " + x + ", Y coords: " + y;
     document.getElementById("debug").innerHTML = coords;
-	
 	}
 
 
@@ -120,11 +121,13 @@ var canvas = document.getElementById('canvas');
 var context= canvas.getContext('2d');
 var radius = 5;
 var dragging = false;
+var paintbucketButton = document.getElementById('paintbucketButton');
 
 
 
 canvas.width = 688;
 canvas.height = 875;
+
 
 context.lineWidth = radius*2
 
