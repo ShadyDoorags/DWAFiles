@@ -84,8 +84,7 @@ height: 30px;
 
         
     <div id = "outsideCanvas">
-    <input id="paintbucketButton" style="position:absolute;left:903px;" class="myButton" type="button" onclick="activateBucket()" value="Paint Bucket"><br/>
-<h2 onclick="showCoords(event)" style="position:relative;left:903px;">Click this heading to get the x (horizontal)<br/> and y (vertical) coordinates of the mouse pointer<br/> when it was clicked.</h2>
+    <input id="paintbucketButton" style="position:absolute;left:903px;" class="myButton" type="button" onclick="activateBucket()" value="Activate Paint Bucket"><br/>
 	</div>
 	
 	<canvas onclick="fill(event)" id="canvas" width="903" height="996" style= "border:2px solid #000000; position:absolute; left:0px; top:0px">
@@ -110,7 +109,7 @@ var context= canvas.getContext('2d');
 var radius = 5;
 var dragging = false;
 var paintBucketActive = false;
-var paintbucketButton = document.getElementById('paintbucketButton');
+var paintBucketButton = document.getElementById('paintbucketButton');
 var debug = document.getElementById('debug');
 
 var selectedColor;
@@ -209,7 +208,13 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 	//used for algorithm search below
 	
 	function activateBucket(){
-	paintBucketActive = true;
+	paintBucketActive = !paintBucketActive;
+	if(paintBucketActive){
+		paintBucketButton.value = "Deactivate Paint Bucket";
+	}else{
+		paintBucketButton.value = "Activate Paint Bucket";
+	}
+	
 	}
 	
 	var canvasArray = new Array(canvas.width);
@@ -222,62 +227,6 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 		nonRecursiveDepthFirstSearch();
 	}
 	}
-	
-	//this had stack overflow
-	/*function startSearch(){
-	arraySetUp();
-	var x = event.clientX;
-	var y = event.clientY;
-	var imgData = context.getImageData(x,y,1,1);
-	var colorFound = {red: 0, green: 0, blue: 0};
-	colorFound.red = imgData.data[0];
-	colorFound.green = imgData.data[1];
-	colorFound.blue = imgData.data[2];
-	var newData = Object.assign({},imgData);
-	newData.red = 0;
-	newData.blue = 255;
-	newData.green = 0;
-	arraySetUp();
-	depthFirstSearch(x,y,colorFound);
-	
-	}
-	
-	
-	//recursion method
-	function depthFirstSearch(x, y, aColor, newData){
-			
-			//you already checked here or it's out of range
-			debug.innerHTML = x +", " + y;
-			if( x >= canvas.width || y >= canvas.height || x < 0 || y < 0 || canvasArray [x][y]){
-				return;
-			}else{
-			canvasArray[x][y] = true;
-			}
-			
-			var imgData = context.getImageData(x,y,1,1);
-			if(imgData.data[0] == aColor.red && imgData.data[1] == aColor.blue && imgData.data[2] == aColor.green){
-				var storeR = imgData[0];
-				var storeG = imgData[1];
-				var storeB = imgData[2];
-				
-				imgData[0] = 0;
-				imgData[1] = 255;
-				imgData[2] = 0;
-				
-				context.putImageData(imgData, x, y);
-				
-				imgData[0] = storeR;
-				imgData[1] = storeG;
-				imgData[2] = storeB;
-				
-				depthFirstSearch(x+1,y,aColor, newData);
-				depthFirstSearch(x,y+1,aColor, newData);
-				depthFirstSearch(x-1,y,aColor, newData);
-				depthFirstSearch(x,y-1,aColor, newData);
-			}
-	
-	
-	}*/
 	
 	function nonRecursiveDepthFirstSearch(){
 	
