@@ -141,6 +141,7 @@ var dragging = false;
 var paintBucketActive = false;
 var paintBucketButton = document.getElementById('paintBucketButton');
 var debug = document.getElementById('debug');
+var selectedColor = 'black';
 
 const modes = {brush :"brush", bucket:"bucket"};
 
@@ -148,7 +149,6 @@ mode = "";
 
 
 
-var selectedColor;
 
 canvas.width = 688;
 canvas.height = 875;
@@ -214,6 +214,15 @@ function setSwatch(e){
     setColor(swatch.style.backgroundColor);
 	selectedColor = swatch.style.backgroundColor;
     swatch.className += ' active';
+	
+	//change name to rgb
+	/*
+	d = document.createElement("div");
+	d.style.color = selectedColor;
+	document.body.appendChild(d)
+	//Color in RGB 
+	debug.innerHTML = window.getComputedStyle(d).color;
+	*/
 }
 
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
@@ -256,7 +265,7 @@ mode = newMode;
 	
 	function fill(event){
 	if (mode == modes.bucket){
-		nonRecursiveDepthFirstSearch();
+		optimizedDepthFirstSearch(event);
 	}
 	}
 	
@@ -371,6 +380,7 @@ mode = newMode;
 		
 		//direction is decided, follow through
 		
+		
 		switch(directionDecided){
 		case 0:
 		//can't go further, so go back
@@ -426,6 +436,125 @@ mode = newMode;
 	
 	}
 	
+	
+	
+	startR = 0;
+	startG = 0;
+	startB = 0;
+	fillColorR = 0;
+	fillColorG = 0;
+	fillColorB = 0;
+	
+	
+	
+	//debug.innerHTML = debug.style.backgroundColor;
+	
+	function optimizedDepthFirstSearch(event){
+	
+	//store current canvas colors
+	colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
+	
+	//store selected color
+	d = document.createElement("div");
+	d.style.color = selectedColor;
+	document.body.appendChild(d)
+	
+	//rgb(#,#,#)
+	stringRep = window.getComputedStyle(d).color;
+	stringRep = stringRep.substring(4,stringRep.length-1)
+	stringSplitRep = stringRep.split(",");
+	//[# , #, #]
+	
+	//# # #
+	stringRep = stringSplitRep[0] + stringSplitRep[1] +stringSplitRep[2];
+	
+	//[#,#,#]
+	stringSplitRep = stringRep.split(" ");
+	
+	
+	fillColorR = parseInt(stringSplitRep[0]);
+	fillColorG = parseInt(stringSplitRep[1]);
+	fillColorB = parseInt(stringSplitRep[2]);
+	
+	startR = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4];
+	startG = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 1];
+	startB = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 2];
+	
+	
+		var pixelStack = [[event.clientX, event.clientY]];
+	
+		var count = 0;
+		while(pixelStack.length && count++ < canvas.height * canvas.width){
+			var newPos, x, y, pixelPos, reachLeft, reachRight;
+			newPos = pixelStack.pop();
+			x = newPos[0];
+			y = newPos[1];
+			
+			pixelPos = (y * canvas.width + x) * 4;
+			while(y-- >= 0 && matchStartColor(pixelPos)){
+				pixelPos -= canvas.width * 4;
+			}
+			pixelPos += canvas.width * 4;
+			//debug.innerHTML += "y after loop" + y;
+			++y;
+			reachLeft = false;
+			reachRight = false;
+			//debug.innerHTML += "y before loop "+ y + "<br/>";
+			while(y++ < canvas.height-1 && matchStartColor(pixelPos)){
+			//debug.innerHTML += "got here";
+				colorPixel(pixelPos);
+				if(x > 0){
+					if(matchStartColor(pixelPos - 4)){
+						if(!reachLeft){
+							pixelStack.push([x-1,y]);
+							reachLeft = true;
+						}
+					}else if(reachLeft){
+						reachLeft = false;
+					}
+				}
+				if(x < canvas.width-1){
+					if(matchStartColor(pixelPos + 4))
+					{
+						if(!reachRight){
+							pixelStack.push([x+1, y]);
+							reachRight = true;
+						}
+					}else if(reachRight){
+						reachRight = false;
+					}
+				}
+				pixelPos += canvas.width * 4;
+			}
+		}
+		context.putImageData(colorLayer, 0, 0);
+	}
+	
+	function matchStartColor(pixelPos){
+	var r = colorLayer.data[pixelPos];
+	var g = colorLayer.data[pixelPos+1];
+	var b = colorLayer.data[pixelPos+2];
+	//debug.innerHTML += "MSC" + r +", " + g +", " + b + "starts -> <br/>";
+	//debug.innerHTML += + startR +", " + startG +", " + startB;
+	
+	return (r == startR && g == startG && b == startB);
+	}
+	
+	function colorPixel(pixelPos){
+	
+	//debug.innerHTML += "CP" + colorLayer.data[pixelPos] + ", " + colorLayer.data[pixelPos+1] + ", " + colorLayer.data[pixelPos] + "filled with";
+		colorLayer.data[pixelPos] = fillColorR;
+		colorLayer.data[pixelPos + 1] = fillColorG;
+		colorLayer.data[pixelPos + 2] = fillColorB;
+		colorLayer.data[pixelPos + 3] = 255;
+	//debug.innerHTML = debubg.innterHTML + colorLayer.data[pixelPos] + ", " + colorLayer.data[pixelPos+1] + ", " + colorLayer.data[pixelPos];
+		
+		//context.beginPath();
+		//context.fillRect(x,y,1,1);
+		//context.fillStyle = selectedColor;		
+		//context.fill();
+	}
+	
 	function arraySetUp(){
 	//set everything to false
 	for(var i = 0; i < canvas.width; i++){
@@ -447,12 +576,12 @@ mode = newMode;
 	}
 
 	//fill with white (otherwise it says it's filled with black even though it's white)
-context.beginPath();
+		context.beginPath();
 		context.fillStyle = 'white';
 		context.strokeStyle = 'white';
 		context.fillRect(0, 0, canvas.width, canvas.height);		
 		context.fill();
-    
+    var colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
 	//END OF ADDED SCRIPTS
 
     
