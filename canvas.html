@@ -48,9 +48,6 @@ z-index: 999;
 
 	.myButton{
 		width: 39px;
-        height: 39px;
-		border-radius: 15px;
-		display: inline-block;
         margin-left: 13px;
 	}
 
@@ -58,7 +55,12 @@ z-index: 999;
 	border: 2px solid white;
     box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.5);
 }
-
+.buttonText{
+	text-align: center;
+	position: relative;
+	font-size: 9px
+	
+}
 
 #clearCanvas{
 position: fixed;
@@ -210,7 +212,6 @@ for(var i=0, n=colors.length;i<n;i++){
     swatch.style.backgroundColor = colors[i];
     swatch.addEventListener('click', setSwatch);
     document.getElementById('colors').appendChild(swatch);
-	debug.innerHTML = swatch.style.height;
 }
 
 function setColor(color){
@@ -247,7 +248,15 @@ brushButton.className = 'myButton';
 brushButton.value = 'Brush';
 brushButton.onclick = function(){setMode('brush')};
 brushButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
+
+var brushText = document.createElement('div');
+brushText.className = 'buttonText';
+brushText.innerHTML = 'brush';
+brushButton.appendChild(brushText);
+
 document.getElementById('colors').appendChild(brushButton);
+
+
 
 //bucket button
 var bucketButton = document.createElement('button');
@@ -255,6 +264,12 @@ bucketButton.className = 'myButton';
 bucketButton.value = 'Bucket';
 bucketButton.onclick = function(){setMode('bucket')};
 bucketButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
+
+var bucketText = document.createElement('div');
+bucketText.className = 'buttonText';
+bucketText.innerHTML = 'bucket';
+bucketButton.appendChild(bucketText);
+
 document.getElementById('colors').appendChild(bucketButton);
 
 
@@ -263,11 +278,8 @@ document.getElementById('colors').appendChild(bucketButton);
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 
-//ADDED SCRIPTS BY SHADY
-
 function setMode(newMode){
 mode = newMode;
-debug.innerHTML = mode;
 }
 	
 	//getting coordinates
@@ -497,6 +509,7 @@ debug.innerHTML = mode;
 	
 	//rgb(#,#,#)
 	stringRep = window.getComputedStyle(d).color;
+	
 	stringRep = stringRep.substring(4,stringRep.length-1)
 	stringSplitRep = stringRep.split(",");
 	//[# , #, #]
@@ -506,6 +519,9 @@ debug.innerHTML = mode;
 	
 	//[#,#,#]
 	stringSplitRep = stringRep.split(" ");
+	
+	//delete that extra element
+	(d.parentNode).removeChild(d);
 	
 	
 	fillColorR = parseInt(stringSplitRep[0]);
@@ -572,8 +588,15 @@ debug.innerHTML = mode;
 	var b = colorLayer.data[pixelPos+2];
 	//debug.innerHTML += "MSC" + r +", " + g +", " + b + "starts -> <br/>";
 	//debug.innerHTML += + startR +", " + startG +", " + startB;
+	limit = 20;
+	return (within(r,startR,20) && within(g,startG,20) && within(b,startB,20));
+	}
 	
-	return (r == startR && g == startG && b == startB);
+	function within(first, second, limit){
+		if(Math.abs(first-second) <= limit) {
+		return true;
+		}
+		return false;
 	}
 	
 	function colorPixel(pixelPos){
@@ -618,7 +641,6 @@ debug.innerHTML = mode;
 		context.fillRect(0, 0, canvas.width, canvas.height);		
 		context.fill();
     var colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
-	//END OF ADDED SCRIPTS
 
     
 
