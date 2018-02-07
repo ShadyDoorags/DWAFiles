@@ -37,13 +37,22 @@ z-index: 999;
 }
     .swatch{
     	width: 39px;
-        height: 39px;
+		 
         border-radius: 15px;
         box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.5), 0px 2px 2px rgba(0, 0, 0, 0.5);
         display: inline-block;
         margin-left: 13px;
         background-color: cyan;
+		
 }
+
+	.myButton{
+		width: 39px;
+        height: 39px;
+		border-radius: 15px;
+		display: inline-block;
+        margin-left: 13px;
+	}
 
 .swatch.active{
 	border: 2px solid white;
@@ -98,12 +107,12 @@ height: 30px;
     	<div id="colors"></div>
     	<div><input id="clearCanvas" type="button" value="CLEAR">
     </div>
-	<div>
-	<input id="brushButton" type="button" onclick="setMode('brush')" value="Brush"> <!--style="position:absolute;left:903px;"--> <br/>
+	<!--<div>
+	<input id="brushButton" type="button" onclick="setMode('brush')" value="Brush"> <!--style="position:absolute;left:903px;" <br/>
         </div>
 	<div>
-	<input id="paintBucketButton" type="button" onclick="setMode('bucket')" value="Bucket"> <!--style="position:absolute;left:903px;"--> <br/>
-        </div>
+	<input id="paintBucketButton" type="button" onclick="setMode('bucket')" value="Bucket"> <!--style="position:absolute;left:903px;" <br/>
+        </div>-->
  
 </div>
 </div>
@@ -142,6 +151,7 @@ var paintBucketActive = false;
 var paintBucketButton = document.getElementById('paintBucketButton');
 var debug = document.getElementById('debug');
 var selectedColor = 'black';
+var buttonTotal = 2;
 
 const modes = {brush :"brush", bucket:"bucket"};
 
@@ -187,16 +197,20 @@ canvas.addEventListener('mousedown', click);
 canvas.addEventListener('mousemove', putPoint);
 canvas.addEventListener('mouseup', release);
 
+
+
+
 //COLOR
 var colors = ['black', 'white', 'grey', 'Bisque', 'LightSalmon', 'red', 'Maroon', 'Chocolate', 'orange', 'yellow', 'Chartreuse', 'SpringGreen', 'green', 'blue', 'DeepSkyBlue', 'cyan', 'indigo', 'BlueViolet', 'violet', 'deepPink'];
-
 
 for(var i=0, n=colors.length;i<n;i++){
 	var swatch = document.createElement('div');
     swatch.className = 'swatch';
+	swatch.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
     swatch.style.backgroundColor = colors[i];
     swatch.addEventListener('click', setSwatch);
     document.getElementById('colors').appendChild(swatch);
+	debug.innerHTML = swatch.style.height;
 }
 
 function setColor(color){
@@ -225,6 +239,27 @@ function setSwatch(e){
 	*/
 }
 
+//BUTTONS
+
+//brush button
+var brushButton = document.createElement('button');
+brushButton.className = 'myButton';
+brushButton.value = 'Brush';
+brushButton.onclick = function(){setMode('brush')};
+brushButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
+document.getElementById('colors').appendChild(brushButton);
+
+//bucket button
+var bucketButton = document.createElement('button');
+bucketButton.className = 'myButton';
+bucketButton.value = 'Bucket';
+bucketButton.onclick = function(){setMode('bucket')};
+bucketButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
+document.getElementById('colors').appendChild(bucketButton);
+
+
+
+
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 
@@ -232,6 +267,7 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 function setMode(newMode){
 mode = newMode;
+debug.innerHTML = mode;
 }
 	
 	//getting coordinates
