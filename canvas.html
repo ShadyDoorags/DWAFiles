@@ -9,12 +9,8 @@
 }
 
 #overlay{
-z-index: 999;
+	z-index: 999;
 }
-
-
-
-
     
 /*Colors*/
 #toolbar{
@@ -27,29 +23,24 @@ z-index: 999;
     background-color: #e7ffff;
     color: white;
     border: 2px solid black;
-    }
-    
-    
+    }   
 #colors{
 	float: left;
     margin-top: 40px;
-    
+   
 }
-    .swatch{
-    	width: 39px;
-		 
-        border-radius: 15px;
-        box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.5), 0px 2px 2px rgba(0, 0, 0, 0.5);
-        display: inline-block;
-        margin-left: 13px;
-        background-color: cyan;
-		
+.swatch{
+	width: 39px;	 
+    border-radius: 15px;
+    box-shadow: inset 0px 1px 0px rgba(255, 255, 255, 0.5), 0px 2px 2px rgba(0, 0, 0, 0.5);
+    display: inline-block;
+    margin-left: 13px;
+    background-color: cyan;		
 }
-
-	.myButton{
-		width: 39px;
-        margin-left: 13px;
-	}
+.myButton{
+	width: 39px;
+    margin-left: 13px;
+}
 
 .swatch.active{
 	border: 2px solid white;
@@ -95,9 +86,6 @@ width: 55px;
 height: 30px;
 }
 
-
-
-
 </style>
 </head>
     
@@ -109,19 +97,10 @@ height: 30px;
     	<div id="colors"></div>
     	<div><input id="clearCanvas" type="button" value="CLEAR">
     </div>
-	<!--<div>
-	<input id="brushButton" type="button" onclick="setMode('brush')" value="Brush"> <!--style="position:absolute;left:903px;" <br/>
-        </div>
-	<div>
-	<input id="paintBucketButton" type="button" onclick="setMode('bucket')" value="Bucket"> <!--style="position:absolute;left:903px;" <br/>
-        </div>-->
  
 </div>
 </div>
 
-        
-    
-	
 	
 	<canvas onclick="fill(event)" id="canvas" width="903" height="996" style= "border:2px solid #000000; position:absolute; left:0px; top:0px">
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
@@ -149,7 +128,6 @@ var canvas = document.getElementById('canvas');
 var context= canvas.getContext('2d');
 var radius = 5;
 var dragging = false;
-var paintBucketActive = false;
 var paintBucketButton = document.getElementById('paintBucketButton');
 var debug = document.getElementById('debug');
 var selectedColor = 'black';
@@ -158,15 +136,10 @@ var buttonTotal = 2;
 const modes = {brush :"brush", bucket:"bucket"};
 
 mode = "";
-
-
-
-
 canvas.width = 688;
 canvas.height = 875;
 
-
-context.lineWidth = radius*2
+context.lineWidth = radius*2;
 
 var putPoint = function(e){
 	
@@ -199,9 +172,6 @@ canvas.addEventListener('mousedown', click);
 canvas.addEventListener('mousemove', putPoint);
 canvas.addEventListener('mouseup', release);
 
-
-
-
 //COLOR
 var colors = ['black', 'white', 'grey', 'Bisque', 'LightSalmon', 'red', 'Maroon', 'Chocolate', 'orange', 'yellow', 'Chartreuse', 'SpringGreen', 'green', 'blue', 'DeepSkyBlue', 'cyan', 'indigo', 'BlueViolet', 'violet', 'deepPink'];
 
@@ -223,21 +193,11 @@ function setColor(color){
     }
 }
 
-
 function setSwatch(e){
 	var swatch = e.target;
     setColor(swatch.style.backgroundColor);
 	selectedColor = swatch.style.backgroundColor;
     swatch.className += ' active';
-	
-	//change name to rgb
-	/*
-	d = document.createElement("div");
-	d.style.color = selectedColor;
-	document.body.appendChild(d)
-	//Color in RGB 
-	debug.innerHTML = window.getComputedStyle(d).color;
-	*/
 }
 
 //BUTTONS
@@ -256,8 +216,6 @@ brushButton.appendChild(brushText);
 
 document.getElementById('colors').appendChild(brushButton);
 
-
-
 //bucket button
 var bucketButton = document.createElement('button');
 bucketButton.className = 'myButton';
@@ -272,19 +230,15 @@ bucketButton.appendChild(bucketText);
 
 document.getElementById('colors').appendChild(bucketButton);
 
-
-
-
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 
 function setMode(newMode){
 mode = newMode;
-}
-	
-	//getting coordinates
-	
-	//this code was used for other functions
+}	
+	//getting coordinates	
+	//this code was used to help write other functions
+	//as of now, it doesn't really do anything
 	function showCoords(event){
 	var x = event.clientX;
     var y = event.clientY;
@@ -302,8 +256,6 @@ mode = newMode;
 	var alpha = imgData.data[3];
 	debug.innerHTML = "rgba at " + x +", "+ y + " = " + red + ", " + green + ", " + blue +", " + alpha;
 	}
-	
-	
 	//used for algorithm search below
 	
 	var canvasArray = new Array(canvas.width);
@@ -312,179 +264,10 @@ mode = newMode;
 	}
 	
 	function fill(event){
-	if (mode == modes.bucket){
-		optimizedDepthFirstSearch(event);
+		if (mode == modes.bucket){
+			optimizedDepthFirstSearch(event);
+		}
 	}
-	}
-	
-	function nonRecursiveDepthFirstSearch(){
-	
-	//setup for the search
-	arraySetUp();
-	var x = event.clientX;
-	var y = event.clientY;
-	var imgData = context.getImageData(x,y,1,1);
-	
-	//store original color
-	storedR = imgData.data[0];
-	storedG = imgData.data[1];
-	storedB = imgData.data[2];
-	
-	//generic blue color for testing
-		
-		//
-	
-	finished = false;
-	var directionDecided = 0;
-	
-	var count = 0;
-	
-	while(!finished){
-	count++;
-	
-	//resets
-	directionDecided = 0;
-	imgData = context.getImageData(x,y,1,1);
-	
-	//we've now visited this spot
-	canvasArray[x][y].visited = true;
-		
-		//debug.innerHTML = debug.innerHTML + x +"," + y;
-	
-			//change the color of the image needs to go here	
-		context.beginPath();
-		context.fillRect(x,y,1,1);
-		context.fillStyle = selectedColor;		
-		context.fill();
-		
-		//check if we've gone right
-		if(!canvasArray[x][y].right){
-		//if it gets passed checkpoints, we go right
-		directionDecided = 1;
-			if(x+1 < canvas.width && x+1 >= 0){
-				imgData = context.getImageData(x+1,y,1,1);
-				//check if we've already gone there or if the color don't match
-				if(canvasArray[x+1][y].visited || !(within10(imgData.data[0], storedR) && within10(imgData.data[1], storedG) && within10(imgData.data[2], storedB))){
-					directionDecided = 0;
-					//debug.innerHTML = debug.innerHTML + ": "+ x + ", " + y + " couldn't go right";
-				}else{
-				//debug.innerHTML = debug.innerHTML + ": "+ x + ", " + y + " is a match which means" + imgData.data[0] + " = " + storedR + " and " + imgData.data[1] + " = " + storedG + " and " + imgData.data[2] + " = " + storedB + " and ";
-				}
-			}else{
-			//can't go out of bounds
-				directionDecided = 0;
-				//debug.innerHTML = debug.innerHTML + ": "+ x + ", " + y + " couldn't go right";
-			}
-		}else{
-			debug.innerHTML = debug.innerHTML + ": "+ x + ", " + y + " couldn't go right";
-		}
-		
-			if(directionDecided == 0 && !canvasArray[x][y].up){
-		//if it gets passed checkpoints, we go up
-		directionDecided = 2;
-			if(y+1 < canvas.height && y+1 >= 0){
-				imgData = context.getImageData(x,y+1,1,1);
-				//check if we've already gone there or if the color don't match
-				if(canvasArray[x][y+1].visited || !(within10(imgData.data[0], storedR) && within10(imgData.data[1], storedG) && within10(imgData.data[2], storedB))){
-					directionDecided = 0;
-				}
-			}else{
-			//can't go out of bounds
-				directionDecided = 0;
-			}
-		}
-		
-	if(directionDecided == 0 && !canvasArray[x][y].left){
-		//if it gets passed checkpoints, we go left
-		directionDecided = 3;
-			if(x-1 < canvas.width && x-1 >= 0){
-				imgData = context.getImageData(x-1,y,1,1);
-				//check if we've already gone there or if the color don't match
-				if(canvasArray[x-1][y].visited || !(within10(imgData.data[0], storedR) && within10(imgData.data[1], storedG) && within10(imgData.data[2], storedB))){
-					directionDecided = 0;
-				}
-			}else{
-			//can't go out of bounds
-				directionDecided = 0;
-			}
-		}
-		
-		if(directionDecided == 0 && !canvasArray[x][y].down){
-		//if it gets passed checkpoints, we go down
-		directionDecided = 4;
-			if(y-1 < canvas.height && y-1 >= 0){
-				imgData = context.getImageData(x,y-1,1,1);
-				//check if we've already gone there or if the color don't match
-				if(canvasArray[x][y-1].visited || !(within10(imgData.data[0], storedR) && within10(imgData.data[1], storedG) && within10(imgData.data[2], storedB))){
-					directionDecided = 0;
-				}
-			}else{
-			//can't go out of bounds
-				directionDecided = 0;
-			}
-		}
-		
-		
-		
-		//direction is decided, follow through
-		
-		
-		switch(directionDecided){
-		case 0:
-		//can't go further, so go back
-		if(canvasArray[x][y].home == 0){
-		
-		//reached origin and can't go anywhere so you're done
-		finished = true;
-		
-		}else if(canvasArray[x][y].home == 1){
-		//came from the right, go back there
-		x++;
-		
-		}else if(canvasArray[x][y].home == 2){
-		//came from up, go back there
-		y++;
-		
-		}else if(canvasArray[x][y].home == 3){
-		//came from the left, go back there
-		x--;
-		
-		}else if(canvasArray[x][y].home == 4){
-		//came from down, go back there
-		y--;
-		}
-		
-		break;
-		
-		case 1:
-		//going right
-		x++;
-		canvasArray[x][y].home = 3;
-		break;
-		case 2:
-		//going up
-		y++;
-		canvasArray[x][y].home = 4;
-		break;
-		case 3:
-		//going left
-		x--;
-		canvasArray[x][y].home = 1;
-		break;
-		case 4:
-		//going down
-		y--;
-		canvasArray[x][y].home = 2;
-		break;
-		
-		}
-		
-		
-	}
-	
-	}
-	
-	
 	
 	startR = 0;
 	startG = 0;
@@ -499,39 +282,38 @@ mode = newMode;
 	
 	function optimizedDepthFirstSearch(event){
 	
-	//store current canvas colors
-	colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
+		//store current canvas colors
+		colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
 	
-	//store selected color
-	d = document.createElement("div");
-	d.style.color = selectedColor;
-	document.body.appendChild(d)
+		//store selected color
+		d = document.createElement("div");
+		d.style.color = selectedColor;
+		document.body.appendChild(d)
 	
-	//rgb(#,#,#)
-	stringRep = window.getComputedStyle(d).color;
+		//rgb(#,#,#)
+		stringRep = window.getComputedStyle(d).color;
 	
-	stringRep = stringRep.substring(4,stringRep.length-1)
-	stringSplitRep = stringRep.split(",");
-	//[# , #, #]
+		stringRep = stringRep.substring(4,stringRep.length-1)
+		stringSplitRep = stringRep.split(",");
+		//[# , #, #]
 	
-	//# # #
-	stringRep = stringSplitRep[0] + stringSplitRep[1] +stringSplitRep[2];
+		//# # #
+		stringRep = stringSplitRep[0] + stringSplitRep[1] +stringSplitRep[2];
 	
-	//[#,#,#]
-	stringSplitRep = stringRep.split(" ");
+		//[#,#,#]
+		stringSplitRep = stringRep.split(" ");
 	
-	//delete that extra element
-	(d.parentNode).removeChild(d);
+		//delete that extra element
+		(d.parentNode).removeChild(d);
 	
 	
-	fillColorR = parseInt(stringSplitRep[0]);
-	fillColorG = parseInt(stringSplitRep[1]);
-	fillColorB = parseInt(stringSplitRep[2]);
+		fillColorR = parseInt(stringSplitRep[0]);
+		fillColorG = parseInt(stringSplitRep[1]);
+		fillColorB = parseInt(stringSplitRep[2]);
 	
-	startR = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4];
-	startG = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 1];
-	startB = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 2];
-	
+		startR = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4];
+		startG = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 1];
+		startB = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 2];
 	
 		var pixelStack = [[event.clientX, event.clientY]];
 	
@@ -547,13 +329,10 @@ mode = newMode;
 				pixelPos -= canvas.width * 4;
 			}
 			pixelPos += canvas.width * 4;
-			//debug.innerHTML += "y after loop" + y;
 			++y;
 			reachLeft = false;
 			reachRight = false;
-			//debug.innerHTML += "y before loop "+ y + "<br/>";
 			while(y++ < canvas.height-1 && matchStartColor(pixelPos)){
-			//debug.innerHTML += "got here";
 				colorPixel(pixelPos);
 				if(x > 0){
 					if(matchStartColor(pixelPos - 4)){
@@ -583,35 +362,26 @@ mode = newMode;
 	}
 	
 	function matchStartColor(pixelPos){
-	var r = colorLayer.data[pixelPos];
-	var g = colorLayer.data[pixelPos+1];
-	var b = colorLayer.data[pixelPos+2];
-	//debug.innerHTML += "MSC" + r +", " + g +", " + b + "starts -> <br/>";
-	//debug.innerHTML += + startR +", " + startG +", " + startB;
-	limit = 20;
-	return (within(r,startR,20) && within(g,startG,20) && within(b,startB,20));
+		var r = colorLayer.data[pixelPos];
+		var g = colorLayer.data[pixelPos+1];
+		var b = colorLayer.data[pixelPos+2];
+		limit = 20;
+		return (within(r,startR,20) && within(g,startG,20) && within(b,startB,20));
 	}
 	
 	function within(first, second, limit){
 		if(Math.abs(first-second) <= limit) {
-		return true;
+			return true;
 		}
 		return false;
 	}
 	
 	function colorPixel(pixelPos){
 	
-	//debug.innerHTML += "CP" + colorLayer.data[pixelPos] + ", " + colorLayer.data[pixelPos+1] + ", " + colorLayer.data[pixelPos] + "filled with";
 		colorLayer.data[pixelPos] = fillColorR;
 		colorLayer.data[pixelPos + 1] = fillColorG;
 		colorLayer.data[pixelPos + 2] = fillColorB;
 		colorLayer.data[pixelPos + 3] = 255;
-	//debug.innerHTML = debubg.innterHTML + colorLayer.data[pixelPos] + ", " + colorLayer.data[pixelPos+1] + ", " + colorLayer.data[pixelPos];
-		
-		//context.beginPath();
-		//context.fillRect(x,y,1,1);
-		//context.fillStyle = selectedColor;		
-		//context.fill();
 	}
 	
 	function arraySetUp(){
@@ -635,15 +405,12 @@ mode = newMode;
 	}
 
 	//fill with white (otherwise it says it's filled with black even though it's white)
-		context.beginPath();
-		context.fillStyle = 'white';
-		context.strokeStyle = 'white';
-		context.fillRect(0, 0, canvas.width, canvas.height);		
-		context.fill();
+	context.beginPath();
+	context.fillStyle = 'white';
+	context.strokeStyle = 'white';
+	context.fillRect(0, 0, canvas.width, canvas.height);		
+	context.fill();
     var colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
-
-    
-
 </script>
 
 
