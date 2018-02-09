@@ -118,15 +118,15 @@ left: 0;
 
        
 	<img src="https://goo.gl/1mrzna" class = "eraseImg">
-	<div id = "container" style="position:relative; z-index:0">
+	<div id = "container" style="position:relative; z-index:0;">
     
 	<canvas id="canvas" onclick="fill(event)" width="903" height="996" style= "border:2px solid #000000;">
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
 	</canvas>
     <canvas id='imgCanvas' style="position:fixed"></canvas>
 	</div>
-	<div id ="imgContainer"  style="z-index:999; position:absolute;pointer-events:none;"> 
-    <img src="https://goo.gl/p18ATN" style="pointer-events:none;">
+	<div id ="imgContainer"  style="left:0; top: 0;  z-index:999; position:fixed; pointer-events:none;"> 
+    <img id="theImg" src="https://goo.gl/p18ATN" style=" position:absolute; left:50px; top: 0; pointer-events:none;">
 	</div>
 	
     
@@ -152,7 +152,14 @@ var debug = document.getElementById('debug');
 var selectedColor = 'black';
 var buttonTotal = 3; //change this at will
 var imageVisible = true;
+
+
+
+
+
 //var imgContainer = document.createElement('div');
+//imgContainer.style.left = imgContainer.width/2;
+//imgContainer.style.top = imgContainer.height/2;
 //imgContainer.appendChild(imgCanvas);
 //document.body.appendChild(imgContainer);
 
@@ -167,7 +174,13 @@ imgCanvas.height = canvas.height;
 
 context.lineWidth = radius*2;
 
+var imgContainer = document.getElementById('imgContainer');
+imgContainer.width = canvas.width;
+imgContainer.height = canvas.height;
 
+var theImg = document.getElementById('theImg');
+//theImg.style.left = theImg.width/2 +"px";
+//theImg.style.top = theImg.height/2 +"px";
 
 
 //IMAGE
