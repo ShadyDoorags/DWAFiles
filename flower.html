@@ -118,16 +118,16 @@ left: 0;
 
        
 	<img src="https://goo.gl/1mrzna" class = "eraseImg">
-	<!--<div id = "container" style="position:relative; z-index:0">-->
+	<div id = "container" style="position:relative; z-index:0">
     
 	<canvas id="canvas" onclick="fill(event)" width="903" height="996" style= "border:2px solid #000000;">
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
 	</canvas>
     <canvas id='imgCanvas' style="position:fixed"></canvas>
-	<!--</div>-->
-	<!--<div id ="imgContainer"  style="z-index:999; position:absolute;"> 
-    <img src="https://goo.gl/4XwYxz">
-	</div>-->
+	</div>
+	<div id ="imgContainer"  style="z-index:999; position:absolute;pointer-events:none;"> 
+    <img src="https://goo.gl/p18ATN" style="pointer-events:none;">
+	</div>
 	
     
     <script>
@@ -142,6 +142,8 @@ var canvas = document.getElementById('canvas');
 var imgCanvas = canvas.cloneNode(true);
 //might not need a second canvas
 
+//everything involving the image canvas is irrelevant
+
 var imgCanvasContext = imgCanvas.getContext('2d');
 var context= canvas.getContext('2d');
 var radius = 5;
@@ -150,9 +152,9 @@ var debug = document.getElementById('debug');
 var selectedColor = 'black';
 var buttonTotal = 3; //change this at will
 var imageVisible = true;
-var imgContainer = document.createElement('div');
-imgContainer.appendChild(imgCanvas);
-document.body.appendChild(imgContainer);
+//var imgContainer = document.createElement('div');
+//imgContainer.appendChild(imgCanvas);
+//document.body.appendChild(imgContainer);
 
 const modes = {brush :"brush", bucket:"bucket"};
 
@@ -169,6 +171,7 @@ context.lineWidth = radius*2;
 
 
 //IMAGE
+//This is old code, ignore it
 var imageFunction = function(e){
 imageObj = new Image();
 imageObj.onload = function() {
@@ -196,6 +199,7 @@ var putPoint = function(e){
 	context.beginPath(); //reset the path
 	context.moveTo(e.clientX, e.clientY); //move the context to the current position
 	}
+	mergePaintingAndImage();
    // imageFunction(e);
 }
 
@@ -204,11 +208,13 @@ if(mode == modes.brush){
 	dragging = true;
 	putPoint(e);
 	}
+	mergePaintingAndImage();
 }
 
 var release = function(){
 	dragging = false;
 	context.beginPath ();
+	mergePaintingAndImage();
 }
 
 canvas.addEventListener('mousedown', click);
@@ -338,6 +344,7 @@ mode = newMode;
 	function fill(event){
 		if (mode == modes.bucket){
 			optimizedDepthFirstSearch(event);
+			mergePaintingAndImage();
 		}
 	}
 	
@@ -497,8 +504,14 @@ mode = newMode;
 	someContext.translate(-canvas.width/2,-canvas.height/2);
 	//fillCanvas('white');
 	};
-	imageObj.src = 'https://goo.gl/4XwYxz';
+	imageObj.src = 'https://goo.gl/p18ATN';
 	//imageObj.crossOrigin = "Anonymous";
+	}
+	
+	function mergePaintingAndImage(){
+	colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
+	imgCanvasContext.putImageData(colorLayer, 0, 0);
+	makeImage(imgCanvasContext);
 	}
 	
 	makeImage(imgCanvasContext);
