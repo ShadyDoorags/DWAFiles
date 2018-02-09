@@ -128,10 +128,9 @@ var canvas = document.getElementById('canvas');
 var context= canvas.getContext('2d');
 var radius = 5;
 var dragging = false;
-var paintBucketButton = document.getElementById('paintBucketButton');
 var debug = document.getElementById('debug');
 var selectedColor = 'black';
-var buttonTotal = 2;
+var buttonTotal = 2; //change this at will
 
 const modes = {brush :"brush", bucket:"bucket"};
 
@@ -173,7 +172,7 @@ canvas.addEventListener('mousemove', putPoint);
 canvas.addEventListener('mouseup', release);
 
 //COLOR
-var colors = ['black', 'white', 'grey', 'Bisque', 'LightSalmon', 'red', 'Maroon', 'Chocolate', 'orange', 'yellow', 'Chartreuse', 'SpringGreen', 'green', 'blue', 'DeepSkyBlue', 'cyan', 'indigo', 'BlueViolet', 'violet', 'deepPink'];
+var colors = ['white', 'black', 'grey', 'Bisque', 'LightSalmon', 'red', 'Maroon', 'Chocolate', 'orange', 'yellow', 'Chartreuse', 'SpringGreen', 'green', 'blue', 'DeepSkyBlue', 'cyan', 'indigo', 'BlueViolet', 'violet', 'deepPink'];
 
 for(var i=0, n=colors.length;i<n;i++){
 	var swatch = document.createElement('div');
