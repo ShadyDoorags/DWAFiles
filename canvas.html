@@ -116,8 +116,8 @@ var clearCanvas = document.getElementById('clearCanvas');
 document.getElementById('clearCanvas').addEventListener('click', function() {
         //context.clearRect(0, 0, canvas.width, canvas.height);
 		context.beginPath();
-		context.fillStyle = selectedColor;
-		context.strokeStyle = selectedColor;
+		context.fillStyle = 'white';
+		context.strokeStyle = 'white';
 		context.fillRect(0, 0, canvas.width, canvas.height);		
 		context.fill();
       }, false);
