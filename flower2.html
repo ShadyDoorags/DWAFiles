@@ -149,6 +149,7 @@ var debug = document.getElementById('debug');
 var selectedColor = 'black';
 var buttonTotal = 3; //change this at will
 var imageVisible = true;
+var imageAddress = "https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_5300675440544bd68c3eee2698771736~mv2.png"
 
 
 
@@ -178,7 +179,7 @@ context.translate(canvas.width/2,canvas.height/2);
 context.drawImage(imageObj,-imageObj.width/2,-imageObj.height/2);
 context.translate(-canvas.width/2,-canvas.height/2);
 };
-imageObj.src = 'https://static.wixstatic.com/media/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png';
+//imageObj.src = 'https://static.wixstatic.com/media/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png';
 }
 
 
@@ -198,7 +199,7 @@ var putPoint = function(e){
 	context.beginPath(); //reset the path
 	context.moveTo(e.clientX, e.clientY); //move the context to the current position
 	}
-	mergePaintingAndImage();
+	//mergePaintingAndImage();
    // imageFunction(e);
 }
 
@@ -207,13 +208,13 @@ if(mode == modes.brush){
 	dragging = true;
 	putPoint(e);
 	}
-	mergePaintingAndImage();
+	//mergePaintingAndImage();
 }
 
 var release = function(){
 	dragging = false;
 	context.beginPath ();
-	mergePaintingAndImage();
+	//mergePaintingAndImage();
 }
 
 canvas.addEventListener('mousedown', click);
@@ -254,24 +255,23 @@ function setSwatch(e){
 
 //BUTTONS
 
-//brush button
-var brushButton = document.createElement('button');
-brushButton.className = 'myButton';
-brushButton.value = 'Brush';
-brushButton.onclick = function(){setMode('brush')};
-brushButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
+//clear button
+var clearButton = document.createElement('button');
+clearButton.className = 'myButton';
+clearButton.onclick = function(){fillCanvas('white')};
+clearButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
 
-var brushText = document.createElement('div');
-brushText.className = 'buttonText';
-brushText.innerHTML = 'brush';
-brushButton.appendChild(brushText);
+var clearText = document.createElement('div');
+clearText.className = 'buttonText';
+clearText.innerHTML = 'clear';
+clearButton.appendChild(clearText);
 
-document.getElementById('colors').appendChild(brushButton);
+document.getElementById('colors').appendChild(clearButton);
 
+/*
 //bucket button
 var bucketButton = document.createElement('button');
 bucketButton.className = 'myButton';
-bucketButton.value = 'Bucket';
 bucketButton.onclick = function(){setMode('bucket')};
 bucketButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
 
@@ -281,17 +281,16 @@ bucketText.innerHTML = 'bucket';
 bucketButton.appendChild(bucketText);
 
 document.getElementById('colors').appendChild(bucketButton);
-
-//show image button
+*/
+//reload outline button
 var showImageButton = document.createElement('button');
 showImageButton.className = 'myButton';
-showImageButton.value = 'showImage';
-showImageButton.onclick = function(){imageVision()};
+showImageButton.onclick = function(){makeImage(context)};
 showImageButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
 
 var showImageButtonText = document.createElement('div');
 showImageButtonText.className = 'buttonText';
-showImageButtonText.innerHTML = 'image';
+showImageButtonText.innerHTML = 'outline';
 showImageButton.appendChild(showImageButtonText);
 
 document.getElementById('colors').appendChild(showImageButton);
@@ -325,6 +324,7 @@ mode = newMode;
 	//used for algorithm search below
 	
 	
+	//old code
 	function imageVision(){
 		imageVisible = !imageVisible;
 		debug.innerHTML = "image is visible: " + imageVisible;
@@ -341,10 +341,9 @@ mode = newMode;
 	}
 	
 	function fill(event){
-		if (mode == modes.bucket){
+		//if (mode == modes.bucket){
 			optimizedDepthFirstSearch(event);
-			mergePaintingAndImage();
-		}
+		//}
 	}
 	
 	startR = 0;
@@ -443,7 +442,7 @@ mode = newMode;
 		var r = colorLayer.data[pixelPos];
 		var g = colorLayer.data[pixelPos+1];
 		var b = colorLayer.data[pixelPos+2];
-		limit = 33;
+		limit = 100;
 		
 		//if(!(within(r,startR,limit) && within(g,startG,limit) && within(b,startB,limit))){
 		//debug.innerHTML = "r: " + r + ", " + startR + " g: " + g + ", " + startG + "b: " + b + ", " + startB + "<br>";
@@ -497,6 +496,21 @@ mode = newMode;
 	context.fill();
 	}
 	
+	function changeNotBlackToWhite(){
+	colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
+	for(var i = 0; i < colorLayer.data.length; i+=4){
+		//if not white, change to black
+		if(colorLayer.data[i] != 0 || colorLayer.data[i+1] != 0 || colorLayer.data[i+2] != 0){
+		debug.innerHTML = colorLayer.data[i] + ", " + colorLayer.data[i+1] + ", " + colorLayer.data[i+2] + "isn't black but will be white";
+		colorLayer.data[i] = 255;
+		colorLayer.data[i+1] = 255;
+		colorLayer.data[i+2] = 255;
+		}
+	
+	}
+		context.putImageData(colorLayer, 0, 0);
+	}
+	
 	fillCanvas('white');
 	
 	//IMAGE
@@ -508,10 +522,12 @@ mode = newMode;
 	var pattern = someContext.createPattern(imageObj,'no-repeat');
 	someContext.fillStyle = pattern;
 	someContext.fillRect(0,0,canvas.width,canvas.height);
+	someContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
 	//someContext.translate(-canvas.width/2,-canvas.height/2);
 	//fillCanvas('white');
+	//changeNotBlackToWhite()
 	};
-	imageObj.src = 'https://static.wixstatic.com/media/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png';
+	imageObj.src = imageAddress;
 	imageObj.crossOrigin = "Anonymous";
 	}
 	
@@ -521,7 +537,7 @@ mode = newMode;
 	makeImage(imgCanvasContext);
 	}
 	
-	makeImage(context);
+	fillCanvas('white');
 	makeImage(context);
 	//fillCanvas('white');
 	
