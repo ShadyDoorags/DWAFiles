@@ -125,7 +125,9 @@ left: 0;
 	</canvas>
     <canvas id='imgCanvas' style="position:fixed"></canvas>
 	</div>
-	
+	<div id ="imgContainer"  style="left:0; top: 0;  z-index:999; position:fixed; pointer-events:none;"> 
+    <img id="theImg" src="https://static.wixstatic.com/media/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png/v1/fill/w_620,h_801,al_c/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png" style=" position:absolute; left:50px; top: 0; pointer-events:none;">
+	</div>
     
     <script>
     
@@ -150,6 +152,7 @@ var selectedColor = 'black';
 var buttonTotal = 3; //change this at will
 var imageVisible = true;
 var imageAddress = "https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_5300675440544bd68c3eee2698771736~mv2.png"
+var imgRep = document.getElementById('theImg');
 
 
 
@@ -166,8 +169,8 @@ context.lineWidth = radius*2;
 
 
 var theImg = document.getElementById('theImg');
-//theImg.style.left = theImg.width/2 +"px";
-//theImg.style.top = theImg.height/2 +"px";
+theImg.style.left = theImg.naturalWidth/2 +"px";
+theImg.style.top = theImg.naturalHeight/2 +"px";
 
 
 //IMAGE
@@ -517,12 +520,19 @@ mode = newMode;
 	var imageObj = new Image();
 	function makeImage(someContext){
 	imageObj.onload = function() {
-	someContext.translate(canvas.width/2 - imageObj.width/2,canvas.height/2 - imageObj.height/2);
+	
+	someContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
 	//someContext.drawImage(imageObj,-imageObj.width/2,-imageObj.height/2);
 	var pattern = someContext.createPattern(imageObj,'no-repeat');
 	someContext.fillStyle = pattern;
 	someContext.fillRect(0,0,canvas.width,canvas.height);
 	someContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
+	
+	
+	 debug.innerHTML = imgRep.naturalWidth;
+	 imgRep.width = imageObj.width;
+	 imgRep.style.top = canvas.height/2 - imageObj.height/2 + 1 +"px";
+	 imgRep.style.left = canvas.width/2 - imageObj.width/2 + 1 + "px";
 	//someContext.translate(-canvas.width/2,-canvas.height/2);
 	//fillCanvas('white');
 	//changeNotBlackToWhite()
