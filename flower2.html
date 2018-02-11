@@ -126,7 +126,7 @@ left: 0;
     <canvas id='imgCanvas' style="position:fixed"></canvas>
 	</div>
 	<div id ="imgContainer"  style="left:0; top: 0;  z-index:999; position:fixed; pointer-events:none;"> 
-    <img id="theImg" src="https://static.wixstatic.com/media/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png/v1/fill/w_620,h_801,al_c/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png" style=" position:absolute; left:50px; top: 0; pointer-events:none;">
+    <img id="theImg" src="https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_620,h_803,al_c/3561f1_5300675440544bd68c3eee2698771736~mv2.png" style=" position:absolute; left:50px; top: 0; pointer-events:none;">
 	</div>
     
     <script>
@@ -149,10 +149,11 @@ var radius = 5;
 var dragging = false;
 var debug = document.getElementById('debug');
 var selectedColor = 'black';
-var buttonTotal = 3; //change this at will
+var buttonTotal = 2; //change this at will
 var imageVisible = true;
 var imageAddress = "https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_5300675440544bd68c3eee2698771736~mv2.png"
 var imgRep = document.getElementById('theImg');
+var colorLimit = 50;
 
 
 
@@ -286,6 +287,7 @@ bucketButton.appendChild(bucketText);
 document.getElementById('colors').appendChild(bucketButton);
 */
 //reload outline button
+/*
 var showImageButton = document.createElement('button');
 showImageButton.className = 'myButton';
 showImageButton.onclick = function(){makeImage(context)};
@@ -297,7 +299,7 @@ showImageButtonText.innerHTML = 'outline';
 showImageButton.appendChild(showImageButtonText);
 
 document.getElementById('colors').appendChild(showImageButton);
-
+*/
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 
@@ -311,7 +313,7 @@ mode = newMode;
 	var x = event.clientX;
     var y = event.clientY;
     var coords = "X coords: " + x + ", Y coords: " + y;
-    debug.innerHTML = coords;
+    //debug.innerHTML = coords;
 	}
 	
 	function checkColor(event){
@@ -322,7 +324,7 @@ mode = newMode;
 	var green = imgData.data[1];
 	var blue = imgData.data[2];
 	var alpha = imgData.data[3];
-	debug.innerHTML = "rgba at " + x +", "+ y + " = " + red + ", " + green + ", " + blue +", " + alpha;
+	//debug.innerHTML = "rgba at " + x +", "+ y + " = " + red + ", " + green + ", " + blue +", " + alpha;
 	}
 	//used for algorithm search below
 	
@@ -330,7 +332,7 @@ mode = newMode;
 	//old code
 	function imageVision(){
 		imageVisible = !imageVisible;
-		debug.innerHTML = "image is visible: " + imageVisible;
+		//debug.innerHTML = "image is visible: " + imageVisible;
 		if(imageVisible){
 			imgContainer.style.visibility = "visible";
 		}else{
@@ -438,24 +440,62 @@ mode = newMode;
 				pixelPos += canvas.width * 4;
 			}
 		}
+		dontChangeOutline();
 		context.putImageData(colorLayer, 0, 0);
+	}
+	
+	//work in progress
+	function dontChangeOutline(){
+	var dummyCanvas = canvas.cloneNode(true);
+	var dummyContext = dummyCanvas.getContext('2d');
+	
+	//fill dummy with white
+	
+	dummyContext.beginPath();
+	dummyContext.fillStyle = 'white';
+	dummyContext.strokeStyle = 'white';
+	dummyContext.fillRect(0, 0, canvas.width, canvas.height);		
+	dummyContext.fill();
+	
+	
+	//put drawing inside of dummy
+	dummyContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
+	var pattern = dummyContext.createPattern(imageObj,'no-repeat');
+	dummyContext.fillStyle = pattern;
+	dummyContext.fillRect(0,0,canvas.width,canvas.height);
+	dummyContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
+	
+	//match dummy with painting
+	var dummyLayerColor = dummyContext.getImageData(0, 0, canvas.width, canvas.height);
+	
+	for(var i = 0; i < dummyLayerColor.data.length; i+=4){
+	
+		//if this isn't white than it must be part of the outline
+		//make sure it doesn't change;
+		if(!(within(dummyLayerColor.data[i], 255) && within(dummyLayerColor.data[i+1], 255) && within(dummyLayerColor.data[i+2], 255)) ){
+			colorLayer.data[i] = dummyLayerColor.data[i];
+			colorLayer.data[i+1] = dummyLayerColor.data[i+1];
+			colorLayer.data[i+2] = dummyLayerColor.data[i+2];
+		}
+			
+	}
+	
 	}
 	
 	function matchStartColor(pixelPos){
 		var r = colorLayer.data[pixelPos];
 		var g = colorLayer.data[pixelPos+1];
 		var b = colorLayer.data[pixelPos+2];
-		limit = 100;
 		
 		//if(!(within(r,startR,limit) && within(g,startG,limit) && within(b,startB,limit))){
 		//debug.innerHTML = "r: " + r + ", " + startR + " g: " + g + ", " + startG + "b: " + b + ", " + startB + "<br>";
 		//}
-		return (within(r,startR,limit) && within(g,startG,limit) && within(b,startB,limit));
+		return (within(r,startR) && within(g,startG) && within(b,startB));
 		//return (r != 0 || g != 0 || b != 0); 
 	}
 	
-	function within(first, second, limit){
-		if(Math.abs(first-second) <= limit) {
+	function within(first, second){
+		if(Math.abs(first-second) <= colorLimit) {
 			return true;
 		}
 		return false;
@@ -504,7 +544,7 @@ mode = newMode;
 	for(var i = 0; i < colorLayer.data.length; i+=4){
 		//if not white, change to black
 		if(colorLayer.data[i] != 0 || colorLayer.data[i+1] != 0 || colorLayer.data[i+2] != 0){
-		debug.innerHTML = colorLayer.data[i] + ", " + colorLayer.data[i+1] + ", " + colorLayer.data[i+2] + "isn't black but will be white";
+		//debug.innerHTML = colorLayer.data[i] + ", " + colorLayer.data[i+1] + ", " + colorLayer.data[i+2] + "isn't black but will be white";
 		colorLayer.data[i] = 255;
 		colorLayer.data[i+1] = 255;
 		colorLayer.data[i+2] = 255;
@@ -529,7 +569,7 @@ mode = newMode;
 	someContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
 	
 	
-	 debug.innerHTML = imgRep.naturalWidth;
+	// debug.innerHTML = imgRep.naturalWidth;
 	 imgRep.width = imageObj.width;
 	 imgRep.style.top = canvas.height/2 - imageObj.height/2 + 1 +"px";
 	 imgRep.style.left = canvas.width/2 - imageObj.width/2 + 1 + "px";
