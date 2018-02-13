@@ -123,14 +123,9 @@ left: 0;
 	<canvas id="canvas" onclick="fill(event)" width="903" height="996" style= "border:2px solid #000000;">
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
 	</canvas>
-    <canvas id='imgCanvas' style="position:fixed"></canvas>
 	</div>
     
     <script>
-    
-	
-
-
 
   
 //DRAW
@@ -152,16 +147,8 @@ var imageAddress = "https://static.wixstatic.com/media/3561f1_5300675440544bd68c
 var imgRep = document.getElementById('theImg');
 var colorLimit = 50;
 
-
-
-const modes = {brush :"brush", bucket:"bucket"};
-
-
-mode = "";
 canvas.width = 688;
 canvas.height = 875;
-imgCanvas.width = canvas.width;
-imgCanvas.height = canvas.height;
 
 context.lineWidth = radius*2;
 
@@ -177,11 +164,6 @@ context.translate(-canvas.width/2,-canvas.height/2);
 };
 }
 
-
-
-
-
-
 var putPoint = function(e){
 	
 	if (dragging){
@@ -194,25 +176,6 @@ var putPoint = function(e){
 	context.moveTo(e.clientX, e.clientY); //move the context to the current position
 	}
 }
-
-var click = function(e){
-if(mode == modes.brush){
-	dragging = true;
-	putPoint(e);
-	}
-}
-
-var release = function(){
-	dragging = false;
-	context.beginPath ();
-}
-
-canvas.addEventListener('mousedown', click);
-canvas.addEventListener('mousemove', putPoint);
-canvas.addEventListener('mouseup', release);
-imgCanvas.addEventListener('mousedown', click);
-imgCanvas.addEventListener('mousemove', putPoint);
-imgCanvas.addEventListener('mouseup', release);
 
 
 //COLOR
@@ -248,7 +211,6 @@ function setSwatch(e){
 //clear button
 var clearButton = document.createElement('button');
 clearButton.className = 'myButton';
-
 clearButton.onclick = function(){fillCanvas('white')};
 clearButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
 
@@ -260,57 +222,9 @@ clearButton.appendChild(clearText);
 document.getElementById('colors').appendChild(clearButton);
 
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
-
-
-function setMode(newMode){
-mode = newMode;
-}	
-	//getting coordinates	
-	//this code was used to help write other functions
-	//as of now, it doesn't really do anything
-	function showCoords(event){
-	var x = event.clientX;
-    var y = event.clientY;
-    var coords = "X coords: " + x + ", Y coords: " + y;
-	}
-	
-	function checkColor(event){
-	var x = event.clientX;
-	var y = event.clientY;
-	var imgData = context.getImageData(x,y,1,1);
-	var red = imgData.data[0];
-	var green = imgData.data[1];
-	var blue = imgData.data[2];
-	var alpha = imgData.data[3];
-	debug.innerHTML = "rgba at " + x +", "+ y + " = " + red + ", " + green + ", " + blue +", " + alpha;
-	}
-	//used for algorithm search below
-	
-	
-	//old code
-	function imageVision(){
-		imageVisible = !imageVisible;
-		//debug.innerHTML = "image is visible: " + imageVisible;
-		if(imageVisible){
-			imgContainer.style.visibility = "visible";
-		}else{
-			imgContainer.style.visibility = "collapse";
-		}
-	}
-	
-	var canvasArray = new Array(canvas.width);
-	for(var i = 0; i < canvas.width; i++){
-		canvasArray[i] = new Array(canvas.height);
-	}
 	
 	function fill(event){
-		//if (mode == modes.bucket){
-		//checkColor(event);
 			optimizedDepthFirstSearch(event);
-			
-			
-			
-		//}
 	}
 	
 	startR = 0;
@@ -319,10 +233,6 @@ mode = newMode;
 	fillColorR = 0;
 	fillColorG = 0;
 	fillColorB = 0;
-	
-	
-	
-	//debug.innerHTML = debug.style.backgroundColor;
 	
 	function optimizedDepthFirstSearch(event){
 	
@@ -427,13 +337,7 @@ mode = newMode;
 	dummyContext.fillStyle = pattern;
 	dummyContext.fillRect(0,0,canvas.width,canvas.height);
 	dummyContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
-	
-	
-	
-	
-	
-	
-	
+
 	var dummyLayerColor = dummyContext.getImageData(0, 0, canvas.width, canvas.height);
 	
 	//change everything that isn't close to black to white
@@ -460,8 +364,7 @@ mode = newMode;
 	}
 	
 	var whiteLimit = 128;
-	
-	
+
 	//match dummy with painting
 	for(var i = 0; i < dummyLayerColor.data.length; i+=4){
 	
@@ -478,53 +381,11 @@ mode = newMode;
 	
 	}
 	
-	function sameShade(firstR, firstG, firstB, secondR, secondG, secondB){
-	
-	//if colors are the same ratio apart (or similar) they are the same shade
-	
-	var shadeDifference = 1;
-	var ratioDifference = 10;
-	
-	var rRatio;
-	var gRatio;
-	var bRatio;
-	
-	if((firstR == 0 || secondR == 0) && within(firstR, secondR, ratioDifference)){
-		rRatio = 1;
-	}else if(firstR != 0){
-		rRatio = secondR/firstR;
-	}else if(secondR != 0){
-		rRatio = firstR/secondR;
-	}
-	
-	if((firstG == 0 || secondG == 0) && within(firstG, secondG, ratioDifference)){
-		gRatio = 1;
-	}else if(firstG != 0){
-		gRatio = secondG/firstG;
-	}else if(secondG != 0){
-		gRatio = firstG/secondG;
-	}
-	
-	if((firstB == 0 || secondB == 0) && within(firstB, secondB, ratioDifference)){
-		bRatio = 1;
-	}else if(firstB != 0){
-		bRatio = secondB/firstB;
-	}else if(secondB != 0){
-		bRatio = firstB/secondB;
-	}
-	
-	
-	return (within(rRatio,gRatio,shadeDifference) && within(gRatio,bRatio, shadeDifference) );
-		
-	}
-	
 	function matchStartColor(pixelPos){
 		var r = colorLayer.data[pixelPos];
 		var g = colorLayer.data[pixelPos+1];
 		var b = colorLayer.data[pixelPos+2];
-		
-		
-		return ( sameShade(startR,startG, startB, r, g, b) && within(r,startR, colorLimit) && within(g,startG,colorLimit) && within(b,startB,colorLimit));
+		return (within(r,startR, colorLimit) && within(g,startG,colorLimit) && within(b,startB,colorLimit));
 	}
 	
 	function within(first, second, limit){
@@ -542,28 +403,6 @@ mode = newMode;
 		colorLayer.data[pixelPos + 3] = 255;
 	}
 	
-	function arraySetUp(){
-	//set everything to false
-	for(var i = 0; i < canvas.width; i++){
-		for(var j = 0; j < canvas.height; j++){
-			canvasArray[i][j] = {visited: false, right: false, up: false, left: false, down: false, home: 0};
-			//[have I been here, did I go right, did I go up, did I go left, did I go down, which direction did I come from] 0 = none, 1 = right, 2 = up, 3 = left, 4 = down
-			}
-			
-		}
-		
-	}
-
-	function within10(first, second){
-	
-	if (Math.abs(first-second) <= 10){
-	return true;
-	}
-	return false;
-	}
-
-	//fill with white (otherwise it says it's filled with black even though it's white)
-	
 	function fillCanvas(color){
 	context.beginPath();
 	context.fillStyle = color;
@@ -572,21 +411,6 @@ mode = newMode;
 	context.fill();
 	makeImage(context);
 	}
-	
-	function changeNotBlackToWhite(){
-	colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
-	for(var i = 0; i < colorLayer.data.length; i+=4){
-		//if not white, change to black
-		if(colorLayer.data[i] != 0 || colorLayer.data[i+1] != 0 || colorLayer.data[i+2] != 0){
-		colorLayer.data[i] = 255;
-		colorLayer.data[i+1] = 255;
-		colorLayer.data[i+2] = 255;
-		}
-	
-	}
-		context.putImageData(colorLayer, 0, 0);
-	}
-	
 	
 	//IMAGE
 	var imageObj = new Image();
@@ -637,7 +461,6 @@ mode = newMode;
 	
 	fillCanvas('white');
 	makeImage(context);
-	//fillCanvas('white');
 	
     var colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
 </script>
