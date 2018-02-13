@@ -37,22 +37,6 @@
     margin-left: 13px;
     background-color: cyan;		
 }
-.myButton{
-	width: 39px;
-    margin-left: 13px;
-}
-
-.swatch.active{
-	border: 2px solid white;
-    box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.5);
-}
-.buttonText{
-	text-align: center;
-	position: absolute;
-	font-size: 9px;
-	
-}
-
 #clearCanvas{
 position: fixed;
 left: 0;
@@ -95,6 +79,21 @@ height: 30px;
     top: -5px;
     z-index: 1;
 }
+.myButton{
+	width: 39px;
+    margin-left: 13px;
+}
+
+.swatch.active{
+	border: 2px solid white;
+    box-shadow: inset 0px 1px 2px rgba(0, 0, 0, 0.5);
+}
+.buttonText{
+	text-align: center;
+	position: absolute;
+	font-size: 9px;
+	
+}
 
 canvas{
 position: fixed;
@@ -110,86 +109,44 @@ left: 0;
 <body style='margin: 0'>
     <div id="toolbar">
     	<div id="colors"></div>
-    	<div id="erase"></div>
-         
-        
+    	<div id="erase"></div>     
 </div>
-</div>
-
-       
+</div>    
 	<img src="https://goo.gl/1mrzna" class = "eraseImg">
-	<div id = "container" style="position:relative; z-index:0;">
-    
+	<div id = "container" style="position:relative; z-index:0;">   
 	<canvas id="canvas" onclick="fill(event)" width="903" height="996" style= "border:2px solid #000000;">
 	Aw man! It looks like you are using a lame browser. Try a cooler browser to join in on the fun!
 	</canvas>
-	</div>
-    
+	</div>   
     <script>
 
   
 //DRAW
 var canvas = document.getElementById('canvas');
-var imgCanvas = canvas.cloneNode(true);
 //might not need a second canvas
 
-//everything involving the image canvas is irrelevant
-
-var imgCanvasContext = imgCanvas.getContext('2d');
 var context= canvas.getContext('2d');
-var radius = 5;
 var dragging = false;
 var debug = document.getElementById('debug');
 var selectedColor = 'black';
-var buttonTotal = 2; //change this at will
+var buttonTotal = 2; //increase this every time a new button is added
 var imageVisible = true;
-var imageAddress = "https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_540,h_699,al_c,usm_0.66_1.00_0.01/3561f1_5300675440544bd68c3eee2698771736~mv2.png"
+var imageAddress = "https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_540,h_699,al_c,usm_0.66_1.00_0.01/3561f1_5300675440544bd68c3eee2698771736~mv2.png";
 var imgRep = document.getElementById('theImg');
+var bestPossibleOutline = true; // change this to false if outline is solid enough to not effect fill algorithm
 var colorLimit = 50;
 
 canvas.width = 688;
 canvas.height = 875;
 
+//not sure what this is for, might be lingering code
+var radius = 5;
 context.lineWidth = radius*2;
-
-
-//IMAGE
-//This is old code, ignore it
-var imageFunction = function(e){
-imageObj = new Image();
-imageObj.onload = function() {
-context.translate(canvas.width/2,canvas.height/2);
-context.drawImage(imageObj,-imageObj.width/2,-imageObj.height/2);
-context.translate(-canvas.width/2,-canvas.height/2);
-};
-}
-
-var putPoint = function(e){
-	
-	if (dragging){
-	context.lineTo(e.clientX, e.clientY); //draw an invisible line
-	context.stroke(); //make the line visible
-	context.beginPath();//start a new path
-	context.arc(e.clientX, e.clientY, radius, 0, Math.PI*2); //draw a circle
-	context.fill(); //fill the context with this color (so fill the circle)
-	context.beginPath(); //reset the path
-	context.moveTo(e.clientX, e.clientY); //move the context to the current position
-	}
-}
-
 
 //COLOR
 var colors = ['white', 'black', 'grey', 'Bisque', 'LightSalmon', 'red', 'Maroon', 'Chocolate', 'orange', 'yellow', 'Chartreuse', 'SpringGreen', 'green', 'blue', 'DeepSkyBlue', 'cyan', 'indigo', 'BlueViolet', 'violet', 'deepPink'];
 
-for(var i=0, n=colors.length;i<n;i++){
-	var swatch = document.createElement('div');
-    swatch.className = 'swatch';
-	swatch.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
-    swatch.style.backgroundColor = colors[i];
-    swatch.addEventListener('click', setSwatch);
-    document.getElementById('colors').appendChild(swatch);
-}
-
+//set color info
 function setColor(color){
 	context.fillStyle = color;
     context.strokeStyle = color;
@@ -199,11 +156,22 @@ function setColor(color){
     }
 }
 
+//set color info to a specific button
 function setSwatch(e){
 	var swatch = e.target;
     setColor(swatch.style.backgroundColor);
 	selectedColor = swatch.style.backgroundColor;
     swatch.className += ' active';
+}
+
+//add different color buttons to a single color object
+for(var i=0, n=colors.length;i<n;i++){
+	var swatch = document.createElement('div');
+    swatch.className = 'swatch';
+	swatch.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
+    swatch.style.backgroundColor = colors[i];
+    swatch.addEventListener('click', setSwatch);
+    document.getElementById('colors').appendChild(swatch);
 }
 
 //BUTTONS
@@ -222,11 +190,13 @@ clearButton.appendChild(clearText);
 document.getElementById('colors').appendChild(clearButton);
 
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
-	
+		
+	//fill algorithm
 	function fill(event){
 			optimizedDepthFirstSearch(event);
 	}
 	
+	//variables for fill algorithm
 	startR = 0;
 	startG = 0;
 	startB = 0;
@@ -234,6 +204,7 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 	fillColorG = 0;
 	fillColorB = 0;
 	
+	//searched through array of colors and fills them
 	function optimizedDepthFirstSearch(event){
 	
 		//store current canvas colors
@@ -246,10 +217,10 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 	
 		//rgb(#,#,#)
 		stringRep = window.getComputedStyle(d).color;
-	
-		stringRep = stringRep.substring(4,stringRep.length-1)
-		stringSplitRep = stringRep.split(",");
+		stringRep = stringRep.substring(4,stringRep.length-1);
+		
 		//[# , #, #]
+		stringSplitRep = stringRep.split(",");
 	
 		//# # #
 		stringRep = stringSplitRep[0] + stringSplitRep[1] +stringSplitRep[2];
@@ -260,18 +231,22 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 		//delete that extra element
 		(d.parentNode).removeChild(d);
 	
-	
+		//store fill color as RGB numbers
 		fillColorR = parseInt(stringSplitRep[0]);
 		fillColorG = parseInt(stringSplitRep[1]);
 		fillColorB = parseInt(stringSplitRep[2]);
 	
+		//store colors on canvas as RGB numbers
 		startR = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4];
 		startG = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 1];
 		startB = colorLayer.data[(event.clientY * canvas.width + event.clientX) * 4 + 2];
 	
 		var pixelStack = [[event.clientX, event.clientY]];
 	
+		//in case loop below goes over
 		var count = 0;
+		
+		//loop for search
 		while(pixelStack.length && count++ < canvas.height * canvas.width){
 			var newPos, x, y, pixelPos, reachLeft, reachRight;
 			newPos = pixelStack.pop();
@@ -313,74 +288,70 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 			}
 		}
 		dontChangeOutline();
+		
+		//put new data onto canvas
 		context.putImageData(colorLayer, 0, 0);
 	}
 	
-	
+	//prevents outline from being effected by fill algorithm
 	function dontChangeOutline(){
-	var dummyCanvas = canvas.cloneNode(true);
-	var dummyContext = dummyCanvas.getContext('2d');
+		//create dummies to store info
+		var dummyCanvas = canvas.cloneNode(true);
+		var dummyContext = dummyCanvas.getContext('2d');
 	
-	//fill dummy with white
+		//fill dummy with white
+		dummyContext.beginPath();
+		dummyContext.fillStyle = 'white';
+		dummyContext.strokeStyle = 'white';
+		dummyContext.fillRect(0, 0, canvas.width, canvas.height);		
+		dummyContext.fill();
 	
-	dummyContext.beginPath();
-	dummyContext.fillStyle = 'white';
-	dummyContext.strokeStyle = 'white';
-	dummyContext.fillRect(0, 0, canvas.width, canvas.height);		
-	dummyContext.fill();
-	
-	var blackLimit = 129;
-	
-	//put drawing inside of dummy
-	dummyContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
-	var pattern = dummyContext.createPattern(imageObj,'no-repeat');
-	dummyContext.fillStyle = pattern;
-	dummyContext.fillRect(0,0,canvas.width,canvas.height);
-	dummyContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
+		//put drawing inside of dummy
+		dummyContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
+		var pattern = dummyContext.createPattern(imageObj,'no-repeat');
+		dummyContext.fillStyle = pattern;
+		dummyContext.fillRect(0,0,canvas.width,canvas.height);
+		dummyContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
 
-	var dummyLayerColor = dummyContext.getImageData(0, 0, canvas.width, canvas.height);
+		var dummyLayerColor = dummyContext.getImageData(0, 0, canvas.width, canvas.height);
 	
-	//change everything that isn't close to black to white
+		if(bestPossibleOutline){
+			//change everything that isn't close to black to white
+			var blackLimit = 129;
+			for(var i = 0; i < dummyLayerColor.data.length; i+=4){
+				if(!(within(dummyLayerColor.data[i], 0, blackLimit) && within(dummyLayerColor.data[i+1], 0, blackLimit) && within(dummyLayerColor.data[i+2], 0,blackLimit)) ){	
+					dummyLayerColor.data[i] = 255;
+					dummyLayerColor.data[i+1] = 255;
+					dummyLayerColor.data[i+2] = 255;
+				}
+			}
+			//change everything that isn't white to black
+			var whiteLimit = 128;
+			for(var i = 0; i < dummyLayerColor.data.length; i+=4){
+				if(!(within(dummyLayerColor.data[i], 255, whiteLimit) && within(dummyLayerColor.data[i+1], 255, whiteLimit) && within(dummyLayerColor.data[i+2], 255,whiteLimit)) ){
+					dummyLayerColor.data[i] = 0;
+					dummyLayerColor.data[i+1] = 0;
+					dummyLayerColor.data[i+2] = 0;
+				}
+			}
 	
-	for(var i = 0; i < dummyLayerColor.data.length; i+=4){
-	if(!(within(dummyLayerColor.data[i], 0, blackLimit) && within(dummyLayerColor.data[i+1], 0, blackLimit) && within(dummyLayerColor.data[i+2], 0,blackLimit)) ){
-			
-			dummyLayerColor.data[i] = 255;
-			dummyLayerColor.data[i+1] = 255;
-			dummyLayerColor.data[i+2] = 255;
-		}else{
+		}
 		
+		//different from inside loop above, but has same use
+		var whiteLimit = 128;
+		//match dummy with painting
+		for(var i = 0; i < dummyLayerColor.data.length; i+=4){
+			//if this isn't white than it must be part of the outline
+			//make sure it doesn't change;
+			if(!(within(dummyLayerColor.data[i], 255, whiteLimit) && within(dummyLayerColor.data[i+1], 255, whiteLimit) && within(dummyLayerColor.data[i+2], 255, whiteLimit)) ){
+				colorLayer.data[i] = dummyLayerColor.data[i];
+				colorLayer.data[i+1] = dummyLayerColor.data[i+1];
+				colorLayer.data[i+2] = dummyLayerColor.data[i+2];
+			}
 		}
 	}
 	
-	var whiteLimit = 128;
-	for(var i = 0; i < dummyLayerColor.data.length; i+=4){
-	if(!(within(dummyLayerColor.data[i], 255, whiteLimit) && within(dummyLayerColor.data[i+1], 255, whiteLimit) && within(dummyLayerColor.data[i+2], 255,whiteLimit)) ){
-			
-			dummyLayerColor.data[i] = 0;
-			dummyLayerColor.data[i+1] = 0;
-			dummyLayerColor.data[i+2] = 0;
-		}
-	}
-	
-	var whiteLimit = 128;
-
-	//match dummy with painting
-	for(var i = 0; i < dummyLayerColor.data.length; i+=4){
-	
-		//if this isn't white than it must be part of the outline
-		//make sure it doesn't change;
-		if(!(within(dummyLayerColor.data[i], 255, whiteLimit) && within(dummyLayerColor.data[i+1], 255, whiteLimit) && within(dummyLayerColor.data[i+2], 255, whiteLimit)) ){
-			colorLayer.data[i] = dummyLayerColor.data[i];
-			colorLayer.data[i+1] = dummyLayerColor.data[i+1];
-			colorLayer.data[i+2] = dummyLayerColor.data[i+2];
-			
-		}
-			
-	}
-	
-	}
-	
+	//returns true if color is certain spot is similar to starting color
 	function matchStartColor(pixelPos){
 		var r = colorLayer.data[pixelPos];
 		var g = colorLayer.data[pixelPos+1];
@@ -388,6 +359,7 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 		return (within(r,startR, colorLimit) && within(g,startG,colorLimit) && within(b,startB,colorLimit));
 	}
 	
+	//returns true if two numbers are within a certain limit of each other
 	function within(first, second, limit){
 		if(Math.abs(first-second) <= limit) {
 			return true;
@@ -395,14 +367,15 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 		return false;
 	}
 	
-	function colorPixel(pixelPos){
-	
+	//change the color in a certain position
+	function colorPixel(pixelPos){	
 		colorLayer.data[pixelPos] = fillColorR;
 		colorLayer.data[pixelPos + 1] = fillColorG;
 		colorLayer.data[pixelPos + 2] = fillColorB;
 		colorLayer.data[pixelPos + 3] = 255;
 	}
 	
+	//fill the entire canvas with a certain color
 	function fillCanvas(color){
 	context.beginPath();
 	context.fillStyle = color;
@@ -414,52 +387,46 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 	
 	//IMAGE
 	var imageObj = new Image();
+	
+	//get and insert initial image onto canvas
 	function makeImage(someContext){
-	imageObj.onload = function() {
+		imageObj.onload = function() {
 	
-	someContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
-	var pattern = someContext.createPattern(imageObj,'no-repeat');
-	someContext.fillStyle = pattern;
-	someContext.fillRect(0,0,canvas.width,canvas.height);
-	someContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
+			someContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
+			var pattern = someContext.createPattern(imageObj,'no-repeat');
+			someContext.fillStyle = pattern;
+			someContext.fillRect(0,0,canvas.width,canvas.height);
+			someContext.translate(-(canvas.width/2 - imageObj.width/2), -(canvas.height/2 - imageObj.height/2));
 	
-	var someData= someContext.getImageData(0, 0, canvas.width, canvas.height);
+			var someData= someContext.getImageData(0, 0, canvas.width, canvas.height);
 	
-	
-	var whiteLimit = 128;
-	for(var i = 0; i < someData.data.length; i+=4){
-	if(!(within(someData.data[i], 255, whiteLimit) && within(someData.data[i+1], 255, whiteLimit) && within(someData.data[i+2], 255,whiteLimit)) ){
-			
-			someData.data[i] = 0;
-			someData.data[i+1] = 0;
-			someData.data[i+2] = 0;
-		}
-	}
-	
-	var blackLimit = 128;
-	for(var i = 0; i < someData.data.length; i+=4){
-	if(!(within(someData.data[i], 0, blackLimit) && within(someData.data[i+1], 0, blackLimit) && within(someData.data[i+2], 0,blackLimit)) ){
-			
-			someData.data[i] = 255;
-			someData.data[i+1] = 255;
-			someData.data[i+2] = 255;
-		}
-	}
-	
-	context.putImageData(someData, 0, 0);
-	
-	};
-	imageObj.src = imageAddress;
-	imageObj.crossOrigin = "Anonymous";
-	}
-	
-	function mergePaintingAndImage(){
-	colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
-	imgCanvasContext.putImageData(colorLayer, 0, 0);
-	makeImage(imgCanvasContext);
-	}
-	
-	fillCanvas('white');
+			if(bestPossibleOutline){
+				var whiteLimit = 128;
+				for(var i = 0; i < someData.data.length; i+=4){
+					if(!(within(someData.data[i], 255, whiteLimit) && within(someData.data[i+1], 255, whiteLimit) && within(someData.data[i+2], 255,whiteLimit)) ){
+						someData.data[i] = 0;
+						someData.data[i+1] = 0;
+						someData.data[i+2] = 0;
+						}
+				}
+				var blackLimit = 128;
+				for(var i = 0; i < someData.data.length; i+=4){
+					if(!(within(someData.data[i], 0, blackLimit) && within(someData.data[i+1], 0, blackLimit) && within(someData.data[i+2], 0,blackLimit)) ){	
+						someData.data[i] = 255;
+						someData.data[i+1] = 255;
+						someData.data[i+2] = 255;
+					}
+				}
+				//put image onto canvas
+				context.putImageData(someData, 0, 0);
+			}
+		};
+		imageObj.src = imageAddress;
+		imageObj.crossOrigin = "Anonymous";
+	}		
+	//fill canvas with white first time around (otherwise, even though it looks white, it will read black)
+	fillCanvas('white');	
+	//put the image on the canvas after it's been fill with white
 	makeImage(context);
 	
     var colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
