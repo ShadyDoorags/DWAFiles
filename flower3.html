@@ -125,9 +125,6 @@ left: 0;
 	</canvas>
     <canvas id='imgCanvas' style="position:fixed"></canvas>
 	</div>
-	<!--<div id ="imgContainer"  style="left:0; top: 0;  z-index:999; position:fixed; pointer-events:none;"> 
-    <img id="theImg" src="https://static.wixstatic.com/media/3561f1_5300675440544bd68c3eee2698771736~mv2.png/v1/fill/w_620,h_803,al_c/3561f1_5300675440544bd68c3eee2698771736~mv2.png" style=" position:absolute; left:50px; top: 0; pointer-events:none;">
-	</div>-->
     
     <script>
     
@@ -169,11 +166,6 @@ imgCanvas.height = canvas.height;
 context.lineWidth = radius*2;
 
 
-//var theImg = document.getElementById('theImg');
-//theImg.style.left = theImg.naturalWidth/2 +"px";
-//theImg.style.top = theImg.naturalHeight/2 +"px";
-
-
 //IMAGE
 //This is old code, ignore it
 var imageFunction = function(e){
@@ -183,7 +175,6 @@ context.translate(canvas.width/2,canvas.height/2);
 context.drawImage(imageObj,-imageObj.width/2,-imageObj.height/2);
 context.translate(-canvas.width/2,-canvas.height/2);
 };
-//imageObj.src = 'https://static.wixstatic.com/media/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png/v1/fill/w_480,h_620,al_c,usm_0.66_1.00_0.01/3561f1_f738cbe5fcf140a8aa7185f2999909a8~mv2.png';
 }
 
 
@@ -193,7 +184,6 @@ context.translate(-canvas.width/2,-canvas.height/2);
 
 var putPoint = function(e){
 	
-    //imageObj.remove();
 	if (dragging){
 	context.lineTo(e.clientX, e.clientY); //draw an invisible line
 	context.stroke(); //make the line visible
@@ -203,8 +193,6 @@ var putPoint = function(e){
 	context.beginPath(); //reset the path
 	context.moveTo(e.clientX, e.clientY); //move the context to the current position
 	}
-	//mergePaintingAndImage();
-   // imageFunction(e);
 }
 
 var click = function(e){
@@ -212,13 +200,11 @@ if(mode == modes.brush){
 	dragging = true;
 	putPoint(e);
 	}
-	//mergePaintingAndImage();
 }
 
 var release = function(){
 	dragging = false;
 	context.beginPath ();
-	//mergePaintingAndImage();
 }
 
 canvas.addEventListener('mousedown', click);
@@ -273,34 +259,6 @@ clearButton.appendChild(clearText);
 
 document.getElementById('colors').appendChild(clearButton);
 
-/*
-//bucket button
-var bucketButton = document.createElement('button');
-bucketButton.className = 'myButton';
-bucketButton.onclick = function(){setMode('bucket')};
-bucketButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
-
-var bucketText = document.createElement('div');
-bucketText.className = 'buttonText';
-bucketText.innerHTML = 'bucket';
-bucketButton.appendChild(bucketText);
-
-document.getElementById('colors').appendChild(bucketButton);
-*/
-//reload outline button
-/*
-var showImageButton = document.createElement('button');
-showImageButton.className = 'myButton';
-showImageButton.onclick = function(){makeImage(context)};
-showImageButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
-
-var showImageButtonText = document.createElement('div');
-showImageButtonText.className = 'buttonText';
-showImageButtonText.innerHTML = 'outline';
-showImageButton.appendChild(showImageButtonText);
-
-document.getElementById('colors').appendChild(showImageButton);
-*/
 setSwatch({target: document.getElementsByClassName('swatch')[0]});
 
 
@@ -314,7 +272,6 @@ mode = newMode;
 	var x = event.clientX;
     var y = event.clientY;
     var coords = "X coords: " + x + ", Y coords: " + y;
-    //debug.innerHTML = coords;
 	}
 	
 	function checkColor(event){
@@ -566,11 +523,8 @@ mode = newMode;
 		var g = colorLayer.data[pixelPos+1];
 		var b = colorLayer.data[pixelPos+2];
 		
-		//if(!(within(r,startR,limit) && within(g,startG,limit) && within(b,startB,limit))){
-		//debug.innerHTML = "r: " + r + ", " + startR + " g: " + g + ", " + startG + "b: " + b + ", " + startB + "<br>";
-		//}
+		
 		return ( sameShade(startR,startG, startB, r, g, b) && within(r,startR, colorLimit) && within(g,startG,colorLimit) && within(b,startB,colorLimit));
-		//return (r != 0 || g != 0 || b != 0); 
 	}
 	
 	function within(first, second, limit){
@@ -624,7 +578,6 @@ mode = newMode;
 	for(var i = 0; i < colorLayer.data.length; i+=4){
 		//if not white, change to black
 		if(colorLayer.data[i] != 0 || colorLayer.data[i+1] != 0 || colorLayer.data[i+2] != 0){
-		//debug.innerHTML = colorLayer.data[i] + ", " + colorLayer.data[i+1] + ", " + colorLayer.data[i+2] + "isn't black but will be white";
 		colorLayer.data[i] = 255;
 		colorLayer.data[i+1] = 255;
 		colorLayer.data[i+2] = 255;
@@ -634,7 +587,6 @@ mode = newMode;
 		context.putImageData(colorLayer, 0, 0);
 	}
 	
-	//fillCanvas('white');
 	
 	//IMAGE
 	var imageObj = new Image();
@@ -642,7 +594,6 @@ mode = newMode;
 	imageObj.onload = function() {
 	
 	someContext.translate(canvas.width/2 - imageObj.naturalWidth/2,canvas.height/2 - imageObj.naturalHeight/2);
-	//someContext.drawImage(imageObj,-imageObj.width/2,-imageObj.height/2);
 	var pattern = someContext.createPattern(imageObj,'no-repeat');
 	someContext.fillStyle = pattern;
 	someContext.fillRect(0,0,canvas.width,canvas.height);
@@ -650,20 +601,6 @@ mode = newMode;
 	
 	var someData= someContext.getImageData(0, 0, canvas.width, canvas.height);
 	
-	
-	
-	// debug.innerHTML = imgRep.naturalWidth;
-	// imgRep.width = imageObj.width;
-	// imgRep.style.top = canvas.height/2 - imageObj.height/2 + 1 +"px";
-	// imgRep.style.left = canvas.width/2 - imageObj.width/2 + 1 + "px";
-	//someContext.translate(-canvas.width/2,-canvas.height/2);
-	//fillCanvas('white');
-	//changeNotBlackToWhite()
-	
-	
-	
-	
-
 	
 	var whiteLimit = 128;
 	for(var i = 0; i < someData.data.length; i+=4){
@@ -703,10 +640,6 @@ mode = newMode;
 	//fillCanvas('white');
 	
     var colorLayer = context.getImageData(0,0,canvas.width,canvas.height);
-	//var drawingColorLayer = imageObj.getImageData(0,0,imageObj.width,imageObj.height);
 </script>
-
-
-
 </body>
 </html>
