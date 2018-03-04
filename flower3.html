@@ -178,7 +178,8 @@ for(var i=0, n=colors.length;i<n;i++){
 //clear button
 var clearButton = document.createElement('button');
 clearButton.className = 'myButton';
-clearButton.onclick = function(){fillCanvas('white')};
+//clearButton.onclick = function(){fillCanvas('white')};
+clearButton.onclick = function(){history.go(0)};
 clearButton.style.height = (canvas.height)/(buttonTotal * 4 + colors.length) + "px";
 
 var clearText = document.createElement('div');
@@ -422,7 +423,9 @@ setSwatch({target: document.getElementsByClassName('swatch')[0]});
 		};
 		imageObj.src = imageAddress;
 		imageObj.crossOrigin = "Anonymous";
-	}		
+	}
+
+	
 	//fill canvas with white first time around (otherwise, even though it looks white, it will read black)
 	fillCanvas('white');	
 	//put the image on the canvas after it's been fill with white
